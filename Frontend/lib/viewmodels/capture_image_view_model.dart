@@ -1,38 +1,81 @@
 // viewmodels/image_view_model.dart
 import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stitch_perfect/models/capture_image_model.dart';
-import 'package:flutter/material.dart';
 
-class CaptureImageViewModel extends ChangeNotifier {
-  final CaptureImageModel _imageModel = CaptureImageModel();
-  File? _selectedImage;
-  bool _isUploading = false;
+class ImageViewModel extends ChangeNotifier {
+  final ImageModel _imageModel = ImageModel();
 
-  File? get selectedImage => _selectedImage;
-  bool get isUploading => _isUploading;
+  // Store file paths for four images
+  final List<File?> _selectedImages = [null, null, null, null];
 
-  Future<void> pickImage(ImageSource source) async {
+  // Upload progress for each image
+  final List<double> _uploadProgress = [0.0, 0.0, 0.0, 0.0];
+
+  // Sample images for placeholders
+  final List<String> _sampleImages = [
+    'assets/images/pose_front.png',
+    'assets/images/pose_back.png',
+    'assets/images/pose_side.png',
+    'assets/images/pose_background.png',
+  ];
+
+  List<File?> get selectedImages => _selectedImages;
+
+  List<double> get uploadProgress => _uploadProgress;
+
+  List<String> get sampleImages => _sampleImages;
+
+  // Pick an image for a specific index
+  Future<void> pickImage(int index, ImageSource source) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
-      _selectedImage = File(pickedFile.path);
+      _selectedImages[index] = File(pickedFile.path);
       notifyListeners();
     }
   }
 
-  Future<bool> uploadImage() async {
-    if (_selectedImage == null) return false;
+  // Remove an image and reset to the sample
+  void removeImage(int index) {
+    _selectedImages[index] = null;
+    _uploadProgress[index] = 0.0;
+    notifyListeners();
+  }
 
-    _isUploading = true;
+  // Remove an image and reset to the sample
+  bool hasImage(int index) {
+    return _selectedImages[index] != null;
+  }
+
+  // Upload an image for a specific index
+  Future<void> uploadImage(int index) async {
+    if (_selectedImages[index] == null) return;
+
+    _uploadProgress[index] = 0.1;
     notifyListeners();
 
-    bool success = await _imageModel.uploadImage(_selectedImage!);
+    bool success = await _imageModel.uploadImageWithProgress(
+      _selectedImages[index]!,
+      (progress) {
+        _uploadProgress[index] = progress;
+        notifyListeners();
+      },
+    );
 
-    _isUploading = false;
+    if (!success) {
+      _uploadProgress[index] = 0.0; // Reset on failure
+    }
     notifyListeners();
+  }
 
-    return success;
+  // Upload all images
+  Future<void> uploadAllImages() async {
+    for (int i = 0; i < _selectedImages.length; i++) {
+      await uploadImage(i);
+    }
   }
 }

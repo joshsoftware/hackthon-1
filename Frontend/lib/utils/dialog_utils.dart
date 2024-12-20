@@ -4,9 +4,8 @@ import 'package:provider/provider.dart';
 import '../viewmodels/capture_image_view_model.dart';
 
 class DialogUtils {
-  static void showImageSourceDialog(BuildContext context) {
-    final viewModel =
-        Provider.of<CaptureImageViewModel>(context, listen: false);
+  static void showImageSourceDialog(BuildContext context, int index) {
+    final viewModel = Provider.of<ImageViewModel>(context, listen: false);
 
     showDialog(
       context: context,
@@ -21,7 +20,7 @@ class DialogUtils {
                 title: Text('Camera'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await viewModel.pickImage(ImageSource.camera);
+                  await viewModel.pickImage(index, ImageSource.camera);
                 },
               ),
               ListTile(
@@ -29,7 +28,7 @@ class DialogUtils {
                 title: Text('Gallery'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await viewModel.pickImage(ImageSource.gallery);
+                  await viewModel.pickImage(index, ImageSource.gallery);
                 },
               ),
             ],
