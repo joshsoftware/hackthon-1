@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stitch_perfect/utils/dialog_utils.dart';
+import 'package:stitch_perfect/viewmodels/capture_image_view_model.dart';
 
-class CaptureScreen extends StatelessWidget {
+class CaptureScreen extends StatefulWidget {
   const CaptureScreen({super.key});
 
   @override
+  State<CaptureScreen> createState() => _CaptureScreenState();
+}
+
+class _CaptureScreenState extends State<CaptureScreen> {
+  @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<ImageViewModel>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Capture Your Photos'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+      appBar: AppBar(title: Text('Capture Your Photos')),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
         child: Column(
@@ -36,16 +42,81 @@ class CaptureScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                children: [
-                  buildCaptureFrame('assets/pose_front.png', context),
-                  buildCaptureFrame('assets/pose_side.png', context),
-                  buildCaptureFrame('assets/pose_back.png', context),
-                  buildCaptureFrame('assets/pose_background.png', context),
-                ],
+              child: GridView.builder(
+                padding: EdgeInsets.all(10),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 5,
+                ),
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  final selectedImage = viewModel.selectedImages[index];
+                  final sampleImage = viewModel.sampleImages[index];
+                  final uploadProgress = viewModel.uploadProgress[index];
+
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: selectedImage != null
+                                  ? FileImage(selectedImage)
+                                  : AssetImage(sampleImage) as ImageProvider,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (uploadProgress > 0.0 && uploadProgress < 1.0)
+                        Positioned.fill(
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: uploadProgress,
+                            ),
+                          ),
+                        ),
+                      if(viewModel.hasImage(index)) Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red, // Background color
+                            shape: BoxShape.circle, // Circular shape
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.close, color: Colors.white),
+                            onPressed: () {
+                              viewModel.removeImage(index);
+                            },
+                          ),
+                        ),
+                      ),
+                      if(!viewModel.hasImage(index)) Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: IconButton(
+                            iconSize: 40,
+                            icon:
+                                Icon(Icons.camera_alt, color: Colors.lightBlue),
+                            onPressed: () {
+                              DialogUtils.showImageSourceDialog(
+                                context,
+                                index,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 10),
@@ -62,7 +133,14 @@ class CaptureScreen extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await viewModel.uploadAllImages();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('All images uploaded successfully!'),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),

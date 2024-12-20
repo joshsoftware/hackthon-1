@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.asset(
-                      'assets/logo.png',
+                      'assets/images/home_logo.png',
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -48,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/capture');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.teal,
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
