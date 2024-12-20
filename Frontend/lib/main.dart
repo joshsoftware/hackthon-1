@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stitch_perfect/screens/capture_screen.dart';
 import 'package:stitch_perfect/screens/home_screen.dart';
+import 'package:stitch_perfect/screens/result_screen.dart';
 import 'package:stitch_perfect/viewmodels/capture_image_view_model.dart';
 
 void main() {
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
-        '/capture': (context) => CaptureScreen(),
+        '/captureScreen': (context) => CaptureScreen(),
+        '/resultScreen': (context) => ResultScreen(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),

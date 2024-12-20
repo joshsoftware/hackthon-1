@@ -76,7 +76,9 @@ class ImageModel {
       // Simulate successful upload
       return true;
     } catch (e) {
-      print("Error during simulated upload: $e");
+      if (kDebugMode) {
+        print("Error during simulated upload: $e");
+      }
       return false;
     }
   }
