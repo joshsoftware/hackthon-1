@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stitch_perfect/screens/capture_screen.dart';
-import 'package:stitch_perfect/screens/home_screen.dart';
 import 'package:stitch_perfect/viewmodels/capture_image_view_model.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CaptureImageViewModel()),
+        ChangeNotifierProvider(create: (_) => ImageViewModel()),
       ],
       child: MyApp(),
     ),
