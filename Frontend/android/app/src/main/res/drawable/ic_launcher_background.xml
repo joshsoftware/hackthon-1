@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Use a hex color for the background -->
+    <item android:drawable="#F9FFF5"/> <!-- Replace with your hex color -->
+    
+    <!-- Your splash image (optional) -->
+    <item>
+        <bitmap
+            android:src="@mipmap/ic_launcher"
+            android:gravity="center"/>
+    </item>
+</layer-list>
