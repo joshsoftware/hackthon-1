@@ -47,7 +47,7 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 ### **2. Installation**
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/your-repo/body-measurement-app.git
+   git clone https://github.com/joshsoftware/hackathon-team-1.git
    cd body-measurement-app
    ```
 2. Install dependencies:  
@@ -111,7 +111,6 @@ We welcome contributions to improve this app!
 
 ---
 
----
 
 ## **Contact**
 For any questions or collaboration requests, feel free to reach out:  
