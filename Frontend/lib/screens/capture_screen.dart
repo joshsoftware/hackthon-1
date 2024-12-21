@@ -150,7 +150,17 @@ class _CaptureScreenState extends State<CaptureScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, // Prevents dialog dismissal on tap outside
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    );
                     bool success = await viewModel.uploadAllImages(height);
+                    Navigator.of(context).pop();
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
