@@ -5,19 +5,24 @@ import 'package:stitch_perfect/models/measurement_model.dart';
 import 'package:stitch_perfect/viewmodels/measurement_view_model.dart';
 
 class MeasurementResultsPage extends StatefulWidget {
-  const MeasurementResultsPage({super.key});
+  final objId;
+
+  const MeasurementResultsPage(this.objId, {super.key});
 
   @override
   _MeasurementResultsPageState createState() => _MeasurementResultsPageState();
 }
 
 class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
+  late String objId;
+
   @override
   void initState() {
     super.initState();
+    objId = widget.objId;
     // Fetch measurements once when the widget is initialized
     final viewModel = Provider.of<MeasurementViewModel>(context, listen: false);
-    viewModel.fetchMeasurements();
+    viewModel.fetchMeasurements(objId);
   }
 
   @override
@@ -39,7 +44,7 @@ class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
             icon: const Icon(Icons.refresh),
             tooltip: "Refresh Measurements",
             onPressed: () {
-              viewModel.fetchMeasurements();
+              viewModel.fetchMeasurements(objId);
             },
           ),
         ],

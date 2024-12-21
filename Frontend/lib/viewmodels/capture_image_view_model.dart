@@ -28,6 +28,8 @@ class ImageViewModel extends ChangeNotifier {
 
   List<String> get sampleImages => _sampleImages;
 
+  String get objId => _imageModel.responseObjId;
+
   // Pick an image for a specific index
   Future<void> pickImage(int index, ImageSource source) async {
     final picker = ImagePicker();
@@ -49,28 +51,6 @@ class ImageViewModel extends ChangeNotifier {
   // Remove an image and reset to the sample
   bool hasImage(int index) {
     return _selectedImages[index] != null;
-  }
-
-  // Upload an image for a specific index
-  Future<void> uploadImage(int index) async {
-    if (_selectedImages[index] == null) return;
-
-    _uploadProgress[index] = 0.1;
-    notifyListeners();
-
-    bool success = await _imageModel.uploadImageWithProgress(
-      _selectedImages[index]!,
-      getFileKey(index),
-      (progress) {
-        _uploadProgress[index] = progress;
-        notifyListeners();
-      },
-    );
-
-    if (!success) {
-      _uploadProgress[index] = 0.0; // Reset on failure
-    }
-    notifyListeners();
   }
 
   // Upload all images

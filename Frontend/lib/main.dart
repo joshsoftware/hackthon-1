@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => HomeScreen(),
         '/captureScreen': (context) => CaptureScreen(),
-        '/resultScreen': (context) => MeasurementResultsPage(),
+        '/resultScreen': (context) => MeasurementResultsPage(""),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
