@@ -22,13 +22,11 @@ def get_shoulder_to_hip_coordinates(image_path):
     right_shoulder = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
     right_hip = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value]
     
-    # Convert the coordinates to pixel values
     left_shoulder_coords = (int(left_shoulder.x * image_width), int(left_shoulder.y * image_height))
     left_hip_coords = (int(left_hip.x * image_width), int(left_hip.y * image_height))
     right_shoulder_coords = (int(right_shoulder.x * image_width), int(right_shoulder.y * image_height))
     right_hip_coords = (int(right_hip.x * image_width), int(right_hip.y * image_height))
 
-    # Calculate the shirt length in pixels (distance from shoulder to hip)
     shirt_length_right_pixels = math.sqrt((right_shoulder_coords[0] - right_hip_coords[0]) ** 2 + 
                                          (right_shoulder_coords[1] - right_hip_coords[1]) ** 2)
     shirt_length_left_pixels = math.sqrt((left_shoulder_coords[0] - left_hip_coords[0]) ** 2 + 
@@ -72,7 +70,7 @@ def extract_human_outline_mediapipe(image_path):
         print("Segmentation failed.")
         return None, None, None, None
 
-def main(image_path):
+def calculate_shirt_length(image_path, height):
     top_pixel, bottom_pixel, edges, mask = extract_human_outline_mediapipe(image_path)
     if top_pixel is None:
         print("Could not detect the highest point.")
@@ -90,24 +88,8 @@ def main(image_path):
     diff_x = bottom_pixel[0] - top_pixel[0]
     diff_y = bottom_pixel[1] - top_pixel[1]
     diff_pixels = math.sqrt(diff_x ** 2 + diff_y ** 2)
-    pixels_per_inch = diff_pixels / 66
+    pixels_per_inch = diff_pixels / height
 
-    # Convert shirt length to inches
     shirt_length_right_inches = (shirt_length_right_pixels / pixels_per_inch) + 2
-    shirt_length_left_inches = (shirt_length_left_pixels / pixels_per_inch) + 2
-
-    print(f"Right Shirt Length: {shirt_length_right_inches} inches")
-    print(f"Left Shirt Length: {shirt_length_left_inches} inches")
-
-    # Display the image with shirt length text
-    image = cv2.imread(image_path)
-    cv2.putText(image, f"Right Shirt Length: {shirt_length_right_inches:.2f} inches", 
-                (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(image, f"Left Shirt Length: {shirt_length_left_inches:.2f} inches", 
-                (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-    cv2.imshow("Result", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-main("nikhil_front.jpg")
+    
+    return shirt_length_right_inches

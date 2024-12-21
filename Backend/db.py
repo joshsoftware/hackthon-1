@@ -15,17 +15,21 @@ def add_measurement(data):
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO measurement (id, chest, waist, shoulder, armlength, height)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO measurement (id, chest, waist, shoulder, armlength, height, leg, shirt)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 data['id'],
                 data['chest'],
                 data['waist'],
                 data['shoulder'],
                 data['arm_length'],
-                data['height']
+                data['height'],
+                data['leg'],
+                data['shirt']
             ))
             conn.commit()
+    except Exception as e:
+        print(e)
     finally:
         conn.close()
 

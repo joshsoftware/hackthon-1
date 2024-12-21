@@ -31,7 +31,6 @@ def get_arm_and_leg_coordinates(image_path):
     left_ankle_coords = (int(left_ankle.x * image_width), int(left_ankle.y * image_height))
     right_ankle_coords = (int(right_ankle.x * image_width), int(right_ankle.y * image_height))
 
-    # Calculate the arm and leg lengths in pixels
     wrist_to_ankle_right_pixels = math.sqrt((right_wrist_coords[0] - right_ankle_coords[0]) ** 2 + 
                                               (right_wrist_coords[1] - right_ankle_coords[1]) ** 2)
     wrist_to_ankle_left_pixels = math.sqrt((left_wrist_coords[0] - left_ankle_coords[0]) ** 2 + 
@@ -97,20 +96,18 @@ def get_hip_coordinates(image_path):
 def find_farthest_edges(edges, left_shoulder, right_shoulder):
     height, width = edges.shape
     
-    # Find Farthest Left Pixel from Left Shoulder
     left_x = left_shoulder[0]
     left_y = left_shoulder[1]
-    for x in range(left_x, -1, -1):  # Move left
+    for x in range(left_x, -1, -1):  
         if edges[left_y, x] > 0:
             leftmost = {"leftmost_x": x, "leftmost_y": left_y}
             break
     else:
         leftmost = {"leftmost_x": left_x, "leftmost_y": left_y}
 
-    # Find Farthest Right Pixel from Right Shoulder
     right_x = right_shoulder[0]
     right_y = right_shoulder[1]
-    for x in range(right_x, width):  # Move right
+    for x in range(right_x, width):  
         if edges[right_y, x] > 0:
             rightmost = {"rightmost_x": x, "rightmost_y": right_y}
             break
@@ -119,7 +116,7 @@ def find_farthest_edges(edges, left_shoulder, right_shoulder):
 
     return leftmost, rightmost
 
-def main(image_path):
+def calculate_legs_length(image_path, height):
     top_pixel, bottom_pixel, edges, mask = extract_human_outline_mediapipe(image_path)
     if top_pixel is None:
         print("Could not detect the highest point.")
@@ -137,24 +134,8 @@ def main(image_path):
     diff_x = bottom_pixel[0] - top_pixel[0]
     diff_y = bottom_pixel[1] - top_pixel[1]
     diff_pixels = math.sqrt(diff_x ** 2 + diff_y ** 2)
-    pixels_per_inch = diff_pixels / 66
+    pixels_per_inch = diff_pixels / height
 
-    # Convert wrist-to-ankle distance to inches
-    wrist_to_ankle_right_inches = (wrist_to_ankle_right_pixels / pixels_per_inch) + 5
-    wrist_to_ankle_left_inches = (wrist_to_ankle_left_pixels / pixels_per_inch) + 5
+    wrist_to_ankle_right_inches = (wrist_to_ankle_right_pixels / pixels_per_inch) + 8
 
-    print(f"Right Leg Length: {wrist_to_ankle_right_inches} inches")
-    print(f"Left Leg Length: {wrist_to_ankle_left_inches} inches")
-
-    # Display the image with leg length text
-    image = cv2.imread(image_path)
-    cv2.putText(image, f"Right Leg Length: {wrist_to_ankle_right_inches:.2f} inches", 
-                (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(image, f"Left Leg Length: {wrist_to_ankle_left_inches:.2f} inches", 
-                (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-    cv2.imshow("Result", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-main("nikhil_front.jpg")
+    return wrist_to_ankle_right_inches 

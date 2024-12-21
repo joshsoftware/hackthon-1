@@ -1,12 +1,16 @@
-from flask import Flask, request, jsonify
-from config import Config
-import uuid
-import os
 from calculate_shoulder_length import calculate_shoulder_length
 from waist_length import calculate_waist_length
-import db
-import utils
+from legs_length import calculate_legs_length
+from shirt_length import calculate_shirt_length
+from arm_length import get_arm_length
+from config import Config
+
+from flask import Flask, request, jsonify
 from decimal import Decimal
+import utils
+import uuid
+import os
+import db
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -53,8 +57,12 @@ def upload_image():
         variable_to_image_map[variable_name] = file_path
     
     height_in_inches = utils.get_inches_from_feet(height)
+    
     shoulder_length = calculate_shoulder_length(variable_to_image_map['front-hand-closed'], height_in_inches)
     waist_length = calculate_waist_length(variable_to_image_map['front-hand-open'], height_in_inches)
+    legs_length = calculate_legs_length(variable_to_image_map['front-hand-closed'], height_in_inches)
+    shirt_length = calculate_shirt_length(variable_to_image_map['front-hand-closed'], height_in_inches)
+    arm_length = get_arm_length(variable_to_image_map['front-hand-closed'], height_in_inches)
 
     for file_path in image_paths.values():
         if os.path.exists(file_path):
@@ -68,7 +76,9 @@ def upload_image():
         "chest": 0,
         "waist": waist_length,
         "shoulder": shoulder_length,
-        "arm_length": 0,
+        "leg": legs_length,
+        "shirt": shirt_length,
+        "arm_length": arm_length,
         "height": height
     }
     
@@ -82,7 +92,6 @@ def get_measurement(id):
     result = db.get_measurement(id)
 
     if result:
-        # Convert all decimal values to float and return the result as a JSON response
         return jsonify({key: float(value) if isinstance(value, Decimal) else value 
                         for key, value in result.items()})
     else:

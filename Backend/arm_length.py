@@ -72,7 +72,7 @@ def extract_human_outline_mediapipe(image_path):
         print("Segmentation failed.")
         return None, None, None, None
 
-def main(image_path):
+def get_arm_length(image_path, height):
     top_pixel, bottom_pixel, edges, mask = extract_human_outline_mediapipe(image_path)
     if top_pixel is None:
         print("Could not detect the highest point.")
@@ -90,24 +90,8 @@ def main(image_path):
     diff_x = bottom_pixel[0] - top_pixel[0]
     diff_y = bottom_pixel[1] - top_pixel[1]
     diff_pixels = math.sqrt(diff_x ** 2 + diff_y ** 2)
-    pixels_per_inch = diff_pixels / 66
+    pixels_per_inch = diff_pixels / height
 
-    # Convert arm length to inches
     arm_length_right_inches = (arm_length_right_pixels / pixels_per_inch) + 4
-    arm_length_left_inches = (arm_length_left_pixels / pixels_per_inch) + 4
 
-    print(f"Right Arm Length: {arm_length_right_inches} inches")
-    print(f"Left Arm Length: {arm_length_left_inches} inches")
-
-    # Display the image with arm length text
-    image = cv2.imread(image_path)
-    cv2.putText(image, f"Right Arm Length: {arm_length_right_inches:.2f} inches", 
-                (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(image, f"Left Arm Length: {arm_length_left_inches:.2f} inches", 
-                (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-    cv2.imshow("Result", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-main("nikhil_front.jpg")
+    return arm_length_right_inches
