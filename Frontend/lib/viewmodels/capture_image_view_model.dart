@@ -16,10 +16,10 @@ class ImageViewModel extends ChangeNotifier {
 
   // Sample images for placeholders
   final List<String> _sampleImages = [
-    'assets/images/pose_front.png',
-    'assets/images/pose_back.png',
+    'assets/images/pose_hands_up.png',
+    'assets/images/pose_hands_open.png',
+    'assets/images/pose_hands_close.png',
     'assets/images/pose_side.png',
-    'assets/images/pose_background.png',
   ];
 
   List<File?> get selectedImages => _selectedImages;

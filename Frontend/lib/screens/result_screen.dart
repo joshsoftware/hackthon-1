@@ -32,7 +32,7 @@ class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.teal.shade300,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -200,80 +200,113 @@ class ResultScreenBody extends StatelessWidget {
         // Buttons
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Add logic for "Capture Again"
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                  icon: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                  ),
-                  label: const Text('Capture Again'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                  ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ShareButton(),
+                SizedBox(
+                  height: 16,
                 ),
-              ),
-              SizedBox(
-                width: 16,
-              ),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Add logic for "Share"
-                    // Example measurements
-                    final measurements = {
-                      "Shoulder Width": 23.5,
-                      "Chest Circumference": 22.0,
-                      "Sleeve Length": 15.0,
-                      "Outseam Length": 30.0,
-                      "Waist Circumference": 36.0,
-                      "Hip Circumference": 38.5,
-                    };
-
-                    // Format the measurements as a string
-                    String measurementText =
-                        "Here are the body measurements:\n\n";
-                    measurements.forEach((key, value) {
-                      measurementText += "$key: $value inches\n";
-                    });
-
-                    // Share via WhatsApp (or any platform)
-                    Share.share(
-                      measurementText,
-                      subject: 'Body Measurements',
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.share,
-                    color: Colors.white,
-                  ),
-                  label: const Text('Share'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+                CaptureImageButton(),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 46),
       ],
+    );
+  }
+}
+
+class CaptureImageButton extends StatelessWidget {
+  const CaptureImageButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 250,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          // Add logic for "Capture Again"
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+        icon: const Icon(
+          Icons.camera_alt,
+          color: Colors.teal,
+        ),
+        label: const Text(
+          'Capture Again',
+          style: TextStyle(
+              fontSize: 16, color: Colors.teal, fontWeight: FontWeight.w600),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.teal,
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ShareButton extends StatelessWidget {
+  const ShareButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 250,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          // Add logic for "Share"
+          // Example measurements
+          final measurements = {
+            "Shoulder Width": 23.5,
+            "Chest Circumference": 22.0,
+            "Sleeve Length": 15.0,
+            "Outseam Length": 30.0,
+            "Waist Circumference": 36.0,
+            "Hip Circumference": 38.5,
+          };
+
+          // Format the measurements as a string
+          String measurementText = "Here are the body measurements:\n\n";
+          measurements.forEach((key, value) {
+            measurementText += "$key: $value inches\n";
+          });
+
+          // Share via WhatsApp (or any platform)
+          Share.share(
+            measurementText,
+            subject: 'Body Measurements',
+          );
+        },
+        icon: const Icon(
+          Icons.share,
+          color: Colors.white,
+        ),
+        label: const Text(
+          'Share',
+          style: TextStyle(
+              fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
     );
   }
 }

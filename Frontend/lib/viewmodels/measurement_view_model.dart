@@ -16,15 +16,16 @@ class MeasurementViewModel extends ChangeNotifier {
   Future<void> fetchMeasurements() async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _measurements = await _service.fetchMeasurements();
-    } catch (error) {
-      _errorMessage = error.toString();
-    } finally {
-      _isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       notifyListeners();
-    }
+      try {
+        _measurements = await _service.fetchMeasurements();
+      } catch (error) {
+        _errorMessage = error.toString();
+      } finally {
+        _isLoading = false;
+        notifyListeners();
+      }
+    });
   }
 }

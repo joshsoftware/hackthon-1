@@ -96,32 +96,3 @@ String getFileKey(int index) {
       return "back";
   }
 }
-
-// class ImageModel {
-//   // Simulated upload function with progress updates
-//   Future<bool> uploadImageWithProgress(
-//     File imageFile,
-//     Function(double) onProgress,
-//   ) async {
-//     try {
-//       const int totalSteps = 100; // Simulate 100 steps for the upload
-//       const Duration stepDuration = Duration(milliseconds: 50); // 50ms per step
-//
-//       for (int step = 0; step <= totalSteps; step++) {
-//         await Future.delayed(stepDuration);
-//
-//         // Calculate and report progress
-//         final progress = step / totalSteps;
-//         onProgress(progress);
-//       }
-//
-//       // Simulate successful upload
-//       return true;
-//     } catch (e) {
-//       if (kDebugMode) {
-//         print("Error during simulated upload: $e");
-//       }
-//       return false;
-//     }
-//   }
-// }
