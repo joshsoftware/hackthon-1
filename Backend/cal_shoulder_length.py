@@ -34,6 +34,7 @@ def calculate_shoulder_length(image_path, person_height_feet):
 
     shoulder_length_pixels = ((right_shoulder_coords[0] - left_shoulder_coords[0]) ** 2 + 
                               (right_shoulder_coords[1] - left_shoulder_coords[1]) ** 2) ** 0.5
+    print(f"Shoulder pixels: {shoulder_length_pixels} inches")
 
     shoulder_length_inches = shoulder_length_pixels / pixels_per_inch
 
@@ -50,7 +51,7 @@ def calculate_shoulder_length(image_path, person_height_feet):
 
     return shoulder_length_inches
 
-image_path = 'images/vinay-front-cropped.jpg'
+image_path = 'vinay_front.jpg'
 person_height_feet = 5.6
 shoulder_length = calculate_shoulder_length(image_path, person_height_feet)
 
