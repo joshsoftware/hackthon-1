@@ -96,6 +96,65 @@ def extract_outline(image_path):
         print("Segmentation failed.")
         return None
 
+
+def get_shoulder_coordinates(image_path):
+    image = cv2.imread(image_path)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image_height, image_width, _ = image.shape
+
+    results = pose.process(image_rgb)
+    if not results.pose_landmarks:
+        print("No pose landmarks detected!")
+        return None, None
+
+    landmarks = results.pose_landmarks.landmark
+    left_shoulder = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value]
+    right_shoulder = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
+    feet = landmarks[mp_pose.PoseLandmark.LEFT_HEEL.value]
+    
+    left_shoulder_coords = (int(left_shoulder.x * image_width), int(left_shoulder.y * image_height))
+    right_shoulder_coords = (int(right_shoulder.x * image_width), int(right_shoulder.y * image_height))
+
+    feet_x = int(feet.x * image_width)
+    feet_y = int(feet.y * image_height)
+    shoulder_length_pixels = ((right_shoulder_coords[0] - left_shoulder_coords[0]) ** 2 + 
+                              (right_shoulder_coords[1] - left_shoulder_coords[1]) ** 2) ** 0.5
+
+
+    return left_shoulder_coords, right_shoulder_coords, feet_x, feet_y, shoulder_length_pixels
+
+def extract_human_outline_mediapipe(image_path):
+    image = cv2.imread(image_path)
+    if image is None:
+        print("Error: Could not load the image.")
+        return None, None
+
+    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    mp_selfie_segmentation = mp.solutions.selfie_segmentation
+    selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
+
+    results = selfie_segmentation.process(rgb_image)
+
+    if results.segmentation_mask is not None:
+        mask = (results.segmentation_mask > 0.5).astype(np.uint8) * 255
+        edges = cv2.Canny(mask, threshold1=50, threshold2=150)
+
+        y_coords, x_coords = np.nonzero(edges)
+
+        topmost_y = np.min(y_coords)
+        bottommost_y = np.max(y_coords)
+
+        topmost_x = x_coords[np.argmin(y_coords)]
+        bottommost_x = x_coords[np.argmax(y_coords)]
+
+        top_pixel = [int(topmost_x), int(topmost_y)]
+        bottom_pixel = [int(bottommost_x), int(bottommost_y)]
+
+        return top_pixel, bottom_pixel
+    else:
+        print("Segmentation failed.")
+        return None, None
 def find_intersection_on_second_image(outline_image_path, chest_y, pixel_per_inch):
     # Extract outline for second image
     edges = extract_outline(outline_image_path)
@@ -145,13 +204,30 @@ def find_intersection_on_second_image(outline_image_path, chest_y, pixel_per_inc
         return distance_inches, image
     return None, None
 # Main Function
-def main(image_path, outline_image_path):
+def calculate_chest_length(image_path, outline_image_path, user_height):
     # Get Shoulder and Hip Coordinates
     left_shoulder_coords, left_hip_coords = get_shoulder_hip_coordinates(image_path)
     if not left_shoulder_coords or not left_hip_coords:
         print("Could not detect shoulder or hip coordinates.")
         return
 
+    top_pixel, bottom_pixel = extract_human_outline_mediapipe(image_path)
+    if top_pixel is None:
+        print("Could not detect the highest point.")
+        return
+
+    left_shoulder_coords, right_shoulder_coords, feet_x, feet_y, shoulder_length_pixels = get_shoulder_coordinates(image_path)
+    if feet_x is None or feet_y is None:
+        print("Could not detect the left heel coordinates.")
+        return
+    if left_shoulder_coords is None or right_shoulder_coords is None:
+        print("Shoulder detection failed.")
+        return
+
+    diff_x = feet_x - top_pixel[0]
+    diff_y = feet_y - top_pixel[1]
+    diff_pixels = math.sqrt(diff_x ** 2 + diff_y ** 2)
+    pixels_per_inch = diff_pixels / user_height
     # Extract Human Outline and Find Chest Points
     farthest_left_point, farthest_right_point, edges, mask = extract_human_outline_and_chest_points(
         image_path, left_shoulder_coords, left_hip_coords
@@ -175,28 +251,21 @@ def main(image_path, outline_image_path):
         # Calculate circumference using average width formula
         circumference = math.pi * (chest_distance_inches + intersection_distance_inches)
         print(f"Estimated Circumference: {circumference/2:.2f} inches")
-
-
-    
-    # Process second image for intersection
-    find_intersection_on_second_image(outline_image_path, chest_y, pixel_per_inch)
+        return circumference/2
+    return 0
 
 
     # Visualize the Results
-    image = cv2.imread(image_path)
-    cv2.circle(image, left_shoulder_coords, 5, (255, 0, 0), -1)  # Blue for left shoulder
-    cv2.circle(image, left_hip_coords, 5, (0, 255, 0), -1)  # Green for left hip
-    cv2.circle(image, farthest_left_point, 5, (0, 0, 255), -1)  # Red for farthest left chest point
-    cv2.circle(image, farthest_right_point, 5, (255, 255, 0), -1)  # Yellow for farthest right chest point
+    # image = cv2.imread(image_path)
+    # cv2.circle(image, left_shoulder_coords, 5, (255, 0, 0), -1)  # Blue for left shoulder
+    # cv2.circle(image, left_hip_coords, 5, (0, 255, 0), -1)  # Green for left hip
+    # cv2.circle(image, farthest_left_point, 5, (0, 0, 255), -1)  # Red for farthest left chest point
+    # cv2.circle(image, farthest_right_point, 5, (255, 255, 0), -1)  # Yellow for farthest right chest point
 
-    # Draw a line along the X-axis of chest points
-    cv2.line(image, farthest_left_point, farthest_right_point, (255, 255, 0), 3)  # Yellow line
+    # # Draw a line along the X-axis of chest points
+    # cv2.line(image, farthest_left_point, farthest_right_point, (255, 255, 0), 3)  # Yellow line
 
-    # Show the image with markings
-    cv2.imshow("Result", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-# Run the Code with an Example Image
-pixel_per_inch = 19.137347319903245
-main("vinay_left1.jpg", "outline_image2.jpg")
+    # # Show the image with markings
+    # cv2.imshow("Result", image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()

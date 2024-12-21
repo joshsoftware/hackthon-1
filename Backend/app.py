@@ -4,6 +4,7 @@ from legs_length import calculate_legs_length
 from shirt_length import calculate_shirt_length
 from arm_length import get_arm_length
 from config import Config
+from bust_size import calculate_chest_length 
 
 from flask import Flask, request, jsonify
 from decimal import Decimal
@@ -63,6 +64,7 @@ def upload_image():
     legs_length = calculate_legs_length(variable_to_image_map['front-hand-closed'], height_in_inches)
     shirt_length = calculate_shirt_length(variable_to_image_map['front-hand-closed'], height_in_inches)
     arm_length = get_arm_length(variable_to_image_map['front-hand-closed'], height_in_inches)
+    chest_length = calculate_chest_length(variable_to_image_map['front-hand-raised'], variable_to_image_map['side'], height_in_inches)
 
     for file_path in image_paths.values():
         if os.path.exists(file_path):
@@ -73,13 +75,13 @@ def upload_image():
 
     data = {
         "id": measurement_id,
-        "chest": 0,
         "waist": waist_length,
         "shoulder": shoulder_length,
         "leg": legs_length,
         "shirt": shirt_length,
         "arm_length": arm_length,
-        "height": height
+        "height": height,
+        "chest": chest_length
     }
     
     db.add_measurement(data)
