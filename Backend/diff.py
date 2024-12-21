@@ -57,21 +57,39 @@ def extract_human_outline_mediapipe(image_path, output_path):
         # Apply Canny Edge Detection
         edges = cv2.Canny(mask, threshold1=50, threshold2=150)
 
-        # Find contours in the edge-detected image
-        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Get Non-zero (Edge) Pixel Coordinates
+        y_coords, x_coords = np.nonzero(edges)
 
-        if contours:
-            # Assume the largest contour is the human outline
-            largest_contour = max(contours, key=cv2.contourArea)
+        # Find Topmost and Bottommost Pixels
+        topmost_y = np.min(y_coords)  # Minimum y (topmost)
+        bottommost_y = np.max(y_coords)  # Maximum y (bottommost)
 
-            # Extract all points from the largest contour
-            all_points = [point[0] for point in largest_contour]
+        # Get Corresponding x Coordinates
+        topmost_x = x_coords[np.argmin(y_coords)]
+        bottommost_x = x_coords[np.argmax(y_coords)]
 
-            # Find the highest (minimum y-coordinate) point
-            highest_point = min(all_points, key=lambda p: p[1])  # Minimum y-coordinate
-            lowest_point = max(all_points, key=lambda p: p[1])   # Maximum y-coordinate
+        top_pixel = [int(topmost_x), int(topmost_y)]
+        bottom_pixel = [int(bottommost_x), int(bottommost_y)]
 
-            return highest_point, lowest_point, edges
+        # Print Results
+        print(f"Topmost Pixel: ({topmost_x}, {topmost_y})")
+        print(f"Bottommost Pixel: ({bottommost_x}, {bottommost_y})")
+
+        # # Find contours in the edge-detected image
+        # contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # if contours:
+        #     # Assume the largest contour is the human outline
+        #     largest_contour = max(contours, key=cv2.contourArea)
+
+        #     # Extract all points from the largest contour
+        #     all_points = [point[0] for point in largest_contour]
+
+        #     # Find the highest (minimum y-coordinate) point
+        #     highest_point = min(all_points, key=lambda p: p[1])  # Minimum y-coordinate
+        #     lowest_point = max(all_points, key=lambda p: p[1])   # Maximum y-coordinate
+
+        return top_pixel, bottom_pixel, edges
     else:
         print("No human detected.")
         return None, None
@@ -125,7 +143,7 @@ def calculate_pixel_difference(image_path, outline_image_path):
     return shoulder_length_inches
 
 # Example usage
-input_image = "vinay_front.png"
+input_image = "sethu_front.png"
 outline_image = "human_outline_mediapipe.png"
 
 shoulder_length = calculate_pixel_difference(input_image, outline_image)
