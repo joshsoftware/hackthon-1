@@ -15,7 +15,16 @@ class _CaptureScreenState extends State<CaptureScreen> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ImageViewModel>(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Capture Your Photos')),
+      appBar: AppBar(
+        title: const Text(
+          'Capture Your Photos',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.teal.shade300,
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
         child: Column(
@@ -30,20 +39,20 @@ class _CaptureScreenState extends State<CaptureScreen> {
             ),
             SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: Text(
                 '1. Please stand where you have White/light background.\n'
                 '2. Please wear Tight clothes or you can capture with Undergarments only - Capture images will not be saved on server.\n'
                 '3. Please wear Dark Coloured clothes.\n'
                 '4. Please capture all photos from same distance & angle.\n'
                 '5. Please capture photos in poses shown in each frame below.',
-                style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                style: TextStyle(fontSize: 14, color: Colors.grey[800]),
               ),
             ),
             SizedBox(height: 20),
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 5,
@@ -58,9 +67,10 @@ class _CaptureScreenState extends State<CaptureScreen> {
                   return Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12),
                             borderRadius: BorderRadius.circular(10),
                             image: DecorationImage(
                               image: selectedImage != null
@@ -79,41 +89,46 @@ class _CaptureScreenState extends State<CaptureScreen> {
                             ),
                           ),
                         ),
-                      if(viewModel.hasImage(index)) Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.red, // Background color
-                            shape: BoxShape.circle, // Circular shape
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.close, color: Colors.white),
-                            onPressed: () {
-                              viewModel.removeImage(index);
-                            },
-                          ),
-                        ),
-                      ),
-                      if(!viewModel.hasImage(index)) Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: IconButton(
-                            iconSize: 40,
-                            icon:
-                                Icon(Icons.camera_alt, color: Colors.lightBlue),
-                            onPressed: () {
-                              DialogUtils.showImageSourceDialog(
-                                context,
-                                index,
-                              );
-                            },
+                      if (viewModel.hasImage(index))
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.teal, // Background color
+                              shape: BoxShape.circle, // Circular shape
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.close, color: Colors.white),
+                              onPressed: () {
+                                viewModel.removeImage(index);
+                              },
+                            ),
                           ),
                         ),
-                      ),
+                      if (!viewModel.hasImage(index))
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: 32,
+                              height: 32,
+                              child: IconButton(
+                                iconSize: 32,
+                                icon: Icon(Icons.camera_alt,
+                                    color: Colors.lightBlue),
+                                onPressed: () {
+                                  DialogUtils.showImageSourceDialog(
+                                    context,
+                                    index,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   );
                 },
@@ -121,17 +136,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
             ),
             SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 16, color: Colors.red),
-                  ),
-                ),
                 ElevatedButton(
                   onPressed: () async {
                     await viewModel.uploadAllImages();
@@ -140,14 +146,21 @@ class _CaptureScreenState extends State<CaptureScreen> {
                         content: Text('All images uploaded successfully!'),
                       ),
                     );
+                    Navigator.pushNamed(context, '/resultScreen');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    backgroundColor: Colors.teal,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Text(
                     'Upload Images',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
