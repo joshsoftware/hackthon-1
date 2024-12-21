@@ -34,7 +34,7 @@ def get_measurement(id):
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
-                SELECT id, chest, waist, shoulder, armlength AS arm_length, height
+                SELECT *
                 FROM measurement
                 WHERE id = %s
             """, (id,))

@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
-import psycopg2
 from config import Config
 import uuid
 import os
 from calculate_shoulder_length import calculate_shoulder_length
+from waist_length import calculate_waist_length
 import db
 import utils
+from decimal import Decimal
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -53,7 +54,8 @@ def upload_image():
     
     height_in_inches = utils.get_inches_from_feet(height)
     shoulder_length = calculate_shoulder_length(variable_to_image_map['front-hand-closed'], height_in_inches)
-    
+    waist_length = calculate_waist_length(variable_to_image_map['front-hand-open'], height_in_inches)
+
     for file_path in image_paths.values():
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -64,7 +66,7 @@ def upload_image():
     data = {
         "id": measurement_id,
         "chest": 0,
-        "waist": 0,
+        "waist": waist_length,
         "shoulder": shoulder_length,
         "arm_length": 0,
         "height": height
@@ -80,15 +82,12 @@ def get_measurement(id):
     result = db.get_measurement(id)
 
     if result:
-        return jsonify({
-            "chest": float(result["chest"]),
-            "waist": float(result["waist"]),
-            "shoulder": float(result["shoulder"]),
-            "armlength": float(result["arm_length"]),
-            "height": float(result["height"]) if "height" in result else None  # Handle case if height is missing
-        })
+        # Convert all decimal values to float and return the result as a JSON response
+        return jsonify({key: float(value) if isinstance(value, Decimal) else value 
+                        for key, value in result.items()})
     else:
         return jsonify({"error": "Measurement not found."}), 404
+
 
 
 if __name__ == "__main__":
