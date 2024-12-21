@@ -1,85 +1,57 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-// class ImageModel {
-//   final String _uploadUrl =
-//       "https://your-server.com/upload"; // Replace with your server URL
-
-//   // Upload image with progress callback
-//   Future<bool> uploadImageWithProgress(
-//     File imageFile,
-//     Function(double) onProgress,
-//   ) async {
-//     try {
-//       final uri = Uri.parse(_uploadUrl);
-//       final request = http.MultipartRequest("POST", uri);
-//       request.files
-//           .add(await http.MultipartFile.fromPath('file', imageFile.path));
-
-//       final streamedResponse = await request.send();
-
-//       final responseStream = streamedResponse.stream;
-//       final contentLength = streamedResponse.contentLength ?? 0;
-
-//       int bytesUploaded = 0;
-//       final List<int> bytes = [];
-
-//       await for (var chunk in responseStream) {
-//         bytes.addAll(chunk);
-//         bytesUploaded += chunk.length;
-
-//         // Update progress
-//         final progress = bytesUploaded / contentLength;
-//         onProgress(progress);
-//       }
-
-//       final response = Response.bytes(
-//         bytes,
-//         streamedResponse.statusCode,
-//         request: streamedResponse.request,
-//         headers: streamedResponse.headers,
-//       );
-
-//       // Check if the upload was successful
-//       return response.statusCode == 200;
-//     } catch (e) {
-//       print("Error uploading image: $e");
-//       return false;
-//     }
-//   }
-// }
-
 class ImageModel {
-  // Simulated upload function with progress updates
-  Future<bool> uploadImageWithProgress(
-    File imageFile,
-    Function(double) onProgress,
-  ) async {
+  final String _uploadUrl =
+      "https://probable-uniquely-scorpion.ngrok-free.app/upload"; // Replace with your server URL
+
+  String responseObjId = "";
+
+  Future<bool> uploadAllImages(List<File?> images, String height) async {
     try {
-      const int totalSteps = 100; // Simulate 100 steps for the upload
-      const Duration stepDuration = Duration(milliseconds: 50); // 50ms per step
-
-      for (int step = 0; step <= totalSteps; step++) {
-        await Future.delayed(stepDuration);
-
-        // Calculate and report progress
-        final progress = step / totalSteps;
-        onProgress(progress);
+      final uri = Uri.parse(_uploadUrl);
+      final request = http.MultipartRequest("POST", uri);
+      for (int i = 0; i < images.length; i++) {
+        request.files.add(
+            await http.MultipartFile.fromPath(getFileKey(i), images[i]!.path));
       }
+      request.fields['height'] = height;
 
-      // Simulate successful upload
+      final response = await request.send();
+
+      // Check if the upload was successful
+      if (response.statusCode == 201) {
+        var responseData = await response.stream.bytesToString();
+        Map<String, dynamic> parsedResponse = json.decode(responseData);
+
+        // Access specific fields
+        responseObjId = parsedResponse["id"];
+      } else {
+        print("Something went wrong.");
+        return false;
+      }
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        print("Error during simulated upload: $e");
-      }
+      print("Error uploading image: $e");
       return false;
     }
+  }
+}
+
+String getFileKey(int index) {
+  switch (index) {
+    case 1:
+      return "front-hand-raised";
+    case 2:
+      return "front-hand-open";
+    case 3:
+      return "front-hand-closed";
+    case 4:
+      return "side";
+    default:
+      return "side";
   }
 }

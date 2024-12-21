@@ -32,8 +32,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
-        '/captureScreen': (context) => CaptureScreen(),
-        '/resultScreen': (context) => MeasurementResultsPage(),
+        '/captureScreen': (context) => CaptureScreen(
+              height: '0',
+            ),
+        '/resultScreen': (context) => MeasurementResultsPage(""),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),

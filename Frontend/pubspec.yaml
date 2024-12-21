@@ -65,10 +65,11 @@ flutter:
   assets:
      - assets/images/home_logo.png
      - assets/images/app_logo.png
-     - assets/images/pose_back.png
+     - assets/images/pose_hands_open.png
+     - assets/images/pose_hands_close.png
      - assets/images/pose_side.png
+     - assets/images/pose_hands_up.png
      - assets/images/pose_front.png
-     - assets/images/pose_background.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

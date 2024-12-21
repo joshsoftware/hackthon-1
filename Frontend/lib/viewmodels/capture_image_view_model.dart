@@ -16,10 +16,10 @@ class ImageViewModel extends ChangeNotifier {
 
   // Sample images for placeholders
   final List<String> _sampleImages = [
-    'assets/images/pose_front.png',
-    'assets/images/pose_back.png',
+    'assets/images/pose_hands_up.png',
+    'assets/images/pose_hands_open.png',
+    'assets/images/pose_hands_close.png',
     'assets/images/pose_side.png',
-    'assets/images/pose_background.png',
   ];
 
   List<File?> get selectedImages => _selectedImages;
@@ -27,6 +27,8 @@ class ImageViewModel extends ChangeNotifier {
   List<double> get uploadProgress => _uploadProgress;
 
   List<String> get sampleImages => _sampleImages;
+
+  String get objId => _imageModel.responseObjId;
 
   // Pick an image for a specific index
   Future<void> pickImage(int index, ImageSource source) async {
@@ -51,31 +53,11 @@ class ImageViewModel extends ChangeNotifier {
     return _selectedImages[index] != null;
   }
 
-  // Upload an image for a specific index
-  Future<void> uploadImage(int index) async {
-    if (_selectedImages[index] == null) return;
-
-    _uploadProgress[index] = 0.1;
-    notifyListeners();
-
-    bool success = await _imageModel.uploadImageWithProgress(
-      _selectedImages[index]!,
-      (progress) {
-        _uploadProgress[index] = progress;
-        notifyListeners();
-      },
-    );
-
-    if (!success) {
-      _uploadProgress[index] = 0.0; // Reset on failure
-    }
-    notifyListeners();
-  }
-
   // Upload all images
-  Future<void> uploadAllImages() async {
-    for (int i = 0; i < _selectedImages.length; i++) {
-      await uploadImage(i);
-    }
+  Future<bool> uploadAllImages(String height) async {
+    // for (int i = 0; i < _selectedImages.length; i++) {
+    //   await uploadImage(i);
+    // }
+    return await _imageModel.uploadAllImages(_selectedImages, height);
   }
 }
