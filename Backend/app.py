@@ -34,10 +34,10 @@ def upload_image():
     
     image_paths = {}
     variable_to_image_map = {
-        'front-hand-close': request.files['front-hand-close'],
+        'front-hand-closed': request.files['front-hand-closed'],
         'front-hand-raised': request.files['front-hand-raised'],
         'side': request.files['side'],
-        'back': request.files['back']
+        'front-hand-open': request.files['front-hand-open']
     }
 
     for variable_name, image in variable_to_image_map.items():
@@ -52,7 +52,7 @@ def upload_image():
         variable_to_image_map[variable_name] = file_path
     
     height_in_inches = utils.get_inches_from_feet(height)
-    shoulder_length = calculate_shoulder_length(variable_to_image_map['front-hand-close'], height_in_inches)
+    shoulder_length = calculate_shoulder_length(variable_to_image_map['front-hand-closed'], height_in_inches)
     
     for file_path in image_paths.values():
         if os.path.exists(file_path):
