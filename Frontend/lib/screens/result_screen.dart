@@ -81,12 +81,12 @@ class ResultScreenBody extends StatelessWidget {
     final double deviceWidth = MediaQuery.of(context).size.width;
     if (measurements != null) {
       topMeasurements = [
-        "Chest Circumference :" + measurements.chest.toString(),
+        "Shoulder Width : " + measurements.shoulder.toString(),
         "Sleeve Length : " + measurements.armlength.toString(),
-        "Shoulder Width : " + measurements.shoulder.toString()
+        "Shirt Length : " + measurements.shirt.toString(),
       ];
       bottomMeasurements = [
-        "Shirt Length : " + measurements.shirt.toString(),
+        "Chest Circumference :" + measurements.chest.toString(),
         "Waist Circumference : " + measurements.waist.toString(),
         "Outseam Length : " + measurements.leg.toString()
       ];
