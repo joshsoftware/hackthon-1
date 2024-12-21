@@ -12,10 +12,10 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 - **Server-side Processing**: Images are uploaded to a secure backend for processing using advanced ML models.  
 - **Measurement Extraction**: Fetches and calculates key body measurements such as:  
   - Shoulder Width  
-  - Chest/Bust Circumference  
+  - Chest Circumference  
   - Waist Circumference  
-  - Hip Circumference  
-  - Inseam Length (for pants)  
+  - Sleeve lenght  
+  - Outseam Length (for pants)  
 - **Real-Time Feedback**: Displays measurement results in a clean and user-friendly interface.  
   
 
@@ -81,29 +81,6 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 - **Arm Length**: Length between shoulder and wrist point
 - **Outseam Length**: Length of Leg
 
----
-
-## **Folder Structure**
-
-```plaintext
-lib/
-│
-├── main.dart                # Entry point of the Flutter app
-├── screens/                 # UI Screens (Home, Results, etc.)
-│   ├── home_screen.dart
-│   ├── result_screen.dart
-│
-├── services/                # API services
-│   ├── api_service.dart     # Handles backend API calls
-│
-├── widgets/                 # Reusable UI components
-│   ├── custom_button.dart
-│   ├── image_preview.dart
-│
-└── utils/                   # Utility functions
-    ├── constants.dart       # API URLs and constants
-    ├── helpers.dart         # Helper functions for scaling and validation
-```
 
 ---
 
