@@ -35,6 +35,12 @@ class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
           'Your Measurements',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.teal.shade300,
