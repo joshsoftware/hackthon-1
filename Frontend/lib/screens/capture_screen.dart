@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stitch_perfect/screens/result_screen.dart';
 import 'package:stitch_perfect/utils/dialog_utils.dart';
 import 'package:stitch_perfect/viewmodels/capture_image_view_model.dart';
 
@@ -149,14 +150,18 @@ class _CaptureScreenState extends State<CaptureScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    bool success = await viewModel.uploadAllImages();
+                    bool success = await viewModel.uploadAllImages(height);
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('All images uploaded successfully!'),
                         ),
                       );
-                      Navigator.pushNamed(context, '/resultScreen');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MeasurementResultsPage(viewModel.objId)));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

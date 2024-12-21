@@ -5,19 +5,24 @@ import 'package:stitch_perfect/models/measurement_model.dart';
 import 'package:stitch_perfect/viewmodels/measurement_view_model.dart';
 
 class MeasurementResultsPage extends StatefulWidget {
-  const MeasurementResultsPage({super.key});
+  final objId;
+
+  const MeasurementResultsPage(this.objId, {super.key});
 
   @override
   _MeasurementResultsPageState createState() => _MeasurementResultsPageState();
 }
 
 class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
+  late String objId;
+
   @override
   void initState() {
     super.initState();
+    objId = widget.objId;
     // Fetch measurements once when the widget is initialized
     final viewModel = Provider.of<MeasurementViewModel>(context, listen: false);
-    viewModel.fetchMeasurements();
+    viewModel.fetchMeasurements(objId);
   }
 
   @override
@@ -39,7 +44,7 @@ class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
             icon: const Icon(Icons.refresh),
             tooltip: "Refresh Measurements",
             onPressed: () {
-              viewModel.fetchMeasurements();
+              viewModel.fetchMeasurements(objId);
             },
           ),
         ],
@@ -66,17 +71,26 @@ class ResultScreenBody extends StatelessWidget {
     required this.measurements,
   });
 
-  final List<MeasurementModel> measurements;
-  List<MeasurementModel> topMeasurements = [];
-  List<MeasurementModel> bottomMeasurements = [];
+  final MeasurementModel measurements;
+  List<String> topMeasurements = [];
+  List<String> bottomMeasurements = [];
 
   @override
   Widget build(BuildContext context) {
     final double deviceHeight = MediaQuery.of(context).size.height;
     final double deviceWidth = MediaQuery.of(context).size.width;
-    if (measurements.length == 6) {
-      topMeasurements = measurements.take(3).toList();
-      bottomMeasurements = measurements.skip(3).toList();
+    if (measurements != null) {
+      topMeasurements = [
+        "Chest Circumference :" + measurements.chest.toString(),
+        "Sleeve Length : " + measurements.armlength.toString(),
+        "Shoulder Width : " + measurements.shoulder.toString()
+      ];
+      bottomMeasurements = [
+        "Shirt Length : " + measurements.shirt.toString(),
+        "Waist Circumference : " + measurements.waist.toString(),
+        "Outseam Length : " + measurements.leg.toString()
+      ];
+      ;
     }
 
     return Column(
@@ -133,19 +147,19 @@ class ResultScreenBody extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      entry.key,
+                                      entry.toString(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    Text(
-                                      entry.value.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   entry.toString(),
+                                    //   style: const TextStyle(
+                                    //     fontSize: 16,
+                                    //     fontWeight: FontWeight.bold,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ))
@@ -172,19 +186,19 @@ class ResultScreenBody extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      entry.key,
+                                      entry.toString(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    Text(
-                                      entry.value.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   entry.toString(),
+                                    //   style: const TextStyle(
+                                    //     fontSize: 16,
+                                    //     fontWeight: FontWeight.bold,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ))
@@ -204,7 +218,7 @@ class ResultScreenBody extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ShareButton(),
+                ShareButton(model: measurements),
                 SizedBox(
                   height: 16,
                 ),
@@ -256,9 +270,9 @@ class CaptureImageButton extends StatelessWidget {
 }
 
 class ShareButton extends StatelessWidget {
-  const ShareButton({
-    super.key,
-  });
+  MeasurementModel model;
+
+  ShareButton({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
@@ -269,12 +283,12 @@ class ShareButton extends StatelessWidget {
           // Add logic for "Share"
           // Example measurements
           final measurements = {
-            "Shoulder Width": 23.5,
-            "Chest Circumference": 22.0,
-            "Sleeve Length": 15.0,
-            "Outseam Length": 30.0,
-            "Waist Circumference": 36.0,
-            "Hip Circumference": 38.5,
+            "Shoulder Width": model.shoulder,
+            "Chest Circumference": model.chest,
+            "Sleeve Length": model.armlength,
+            "Outseam Length": model.leg,
+            "Waist Circumference": model.waist,
+            "Shirt Length": model.shirt,
           };
 
           // Format the measurements as a string

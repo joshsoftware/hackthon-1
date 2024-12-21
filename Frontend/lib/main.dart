@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         '/captureScreen': (context) => CaptureScreen(
               height: '0',
             ),
-        '/resultScreen': (context) => MeasurementResultsPage(),
+        '/resultScreen': (context) => MeasurementResultsPage(""),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
