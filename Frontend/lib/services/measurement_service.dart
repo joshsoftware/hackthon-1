@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http; // For API calls
 import 'package:stitch_perfect/models/measurement_model.dart';
 
 class MeasurementService {
-  Future<List<MeasurementModel>> fetchMeasurements(String objId) async {
+  Future<MeasurementModel> fetchMeasurements(String objId) async {
     // Simulating API URL
     String apiUrl =
         "https://probable-uniquely-scorpion.ngrok-free.app/measurement/${objId}";
@@ -12,9 +12,8 @@ class MeasurementService {
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-
-      return jsonData.map((data) => MeasurementModel.fromJson(data)).toList();
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      return MeasurementModel.fromJson(jsonData);
     } else {
       throw Exception("Failed to load measurements");
     }

@@ -5,11 +5,11 @@ import 'package:stitch_perfect/services/measurement_service.dart';
 class MeasurementViewModel extends ChangeNotifier {
   final MeasurementService _service = MeasurementService();
 
-  List<MeasurementModel> _measurements = [];
+  late MeasurementModel _measurements;
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<MeasurementModel> get measurements => _measurements;
+  MeasurementModel get measurements => _measurements;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 

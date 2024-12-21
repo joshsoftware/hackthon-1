@@ -20,19 +20,12 @@ class ImageModel {
       }
       request.fields['height'] = height;
 
-      final streamedResponse = await request.send();
-      final List<int> bytes = [];
-
-      final response = Response.bytes(
-        bytes,
-        streamedResponse.statusCode,
-        request: streamedResponse.request,
-        headers: streamedResponse.headers,
-      );
+      final response = await request.send();
 
       // Check if the upload was successful
       if (response.statusCode == 201) {
-        Map<String, dynamic> parsedResponse = json.decode(response.body);
+        var responseData = await response.stream.bytesToString();
+        Map<String, dynamic> parsedResponse = json.decode(responseData);
 
         // Access specific fields
         responseObjId = parsedResponse["id"];
