@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stitch_perfect/screens/capture_screen.dart';
+import 'package:stitch_perfect/widgets/HeightInputDialogWidget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,8 +42,31 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/captureScreen');
+              onPressed: () async {
+                // Show the height input dialog and wait for the result
+                String? height = await showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return HeightInputDialog(
+                      onHeightSubmitted: (height) {
+                        // Handle the height submission and pass it back to the caller
+                        Navigator.of(context).pop(height);
+                      },
+                    );
+                  },
+                );
+
+                if (height != null && height.isNotEmpty) {
+                  FocusScope.of(context).unfocus();
+                  // Navigate to the next screen with the entered height
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CaptureScreen(height: height),
+                    ),
+                  );
+                }
+                //Navigator.pushNamed(context, '/captureScreen');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
