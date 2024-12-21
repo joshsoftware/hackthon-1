@@ -31,8 +31,8 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
   - `http` (for API calls to the backend)  
 
 ### **Backend**
-- **Framework**: Flask/Django/Python (or your preferred backend framework)  
-- **Image Processing**: MediaPipe, OpenCV  
+- **Framework**: Flask
+- **Image Processing**: MediaPipe, OpenCV, Human Outline Detection
 - **Database**: (Optional) PostgreSQL for logging or tailor integration.  
 
 ---
@@ -41,7 +41,7 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 
 ### **1. Prerequisites**
 - Flutter SDK: [Install Flutter](https://flutter.dev/docs/get-started/install)  
-- Backend server setup with the required ML models.  
+- Backend server setup with the mediapipe and openCV ML models.  
 - Device with a working camera.  
 
 ### **2. Installation**
@@ -77,8 +77,9 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 - **Shoulder Width**: Distance between shoulder keypoints.  
 - **Chest/Bust Circumference**: Estimated from chest and back keypoints.  
 - **Waist Circumference**: Calculated from the narrowest torso keypoints.  
-- **Hip Circumference**: Measured from the widest hip keypoints.  
-- **Inseam Length**: Length between the groin, knee, and ankle keypoints.  
+- **Shirt Length**: Shirt Length  
+- **Arm Length**: Length between shoulder and wrist point
+- **Outseam Length**: Length of Leg
 
 ---
 
@@ -132,9 +133,6 @@ We welcome contributions to improve this app!
 5. Open a pull request.  
 
 ---
-
-## **License**
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
