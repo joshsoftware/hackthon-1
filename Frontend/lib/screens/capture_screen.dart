@@ -79,41 +79,43 @@ class _CaptureScreenState extends State<CaptureScreen> {
                             ),
                           ),
                         ),
-                      if(viewModel.hasImage(index)) Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.red, // Background color
-                            shape: BoxShape.circle, // Circular shape
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.close, color: Colors.white),
-                            onPressed: () {
-                              viewModel.removeImage(index);
-                            },
-                          ),
-                        ),
-                      ),
-                      if(!viewModel.hasImage(index)) Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: IconButton(
-                            iconSize: 40,
-                            icon:
-                                Icon(Icons.camera_alt, color: Colors.lightBlue),
-                            onPressed: () {
-                              DialogUtils.showImageSourceDialog(
-                                context,
-                                index,
-                              );
-                            },
+                      if (viewModel.hasImage(index))
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red, // Background color
+                              shape: BoxShape.circle, // Circular shape
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.close, color: Colors.white),
+                              onPressed: () {
+                                viewModel.removeImage(index);
+                              },
+                            ),
                           ),
                         ),
-                      ),
+                      if (!viewModel.hasImage(index))
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: IconButton(
+                              iconSize: 40,
+                              icon: Icon(Icons.camera_alt,
+                                  color: Colors.lightBlue),
+                              onPressed: () {
+                                DialogUtils.showImageSourceDialog(
+                                  context,
+                                  index,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                     ],
                   );
                 },
@@ -134,10 +136,13 @@ class _CaptureScreenState extends State<CaptureScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await viewModel.uploadAllImages();
+                    bool success = await viewModel.uploadAllImages();
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('All images uploaded successfully!'),
+                        content: success
+                            ? Text('All images uploaded successfully!')
+                            : Text('Images uploading failed!'),
                       ),
                     );
                   },

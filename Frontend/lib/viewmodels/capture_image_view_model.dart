@@ -60,6 +60,7 @@ class ImageViewModel extends ChangeNotifier {
 
     bool success = await _imageModel.uploadImageWithProgress(
       _selectedImages[index]!,
+      getFileKey(index),
       (progress) {
         _uploadProgress[index] = progress;
         notifyListeners();
@@ -73,9 +74,10 @@ class ImageViewModel extends ChangeNotifier {
   }
 
   // Upload all images
-  Future<void> uploadAllImages() async {
-    for (int i = 0; i < _selectedImages.length; i++) {
-      await uploadImage(i);
-    }
+  Future<bool> uploadAllImages() async {
+    // for (int i = 0; i < _selectedImages.length; i++) {
+    //   await uploadImage(i);
+    // }
+    return await _imageModel.uploadAllImages(_selectedImages);
   }
 }
