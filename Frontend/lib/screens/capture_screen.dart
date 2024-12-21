@@ -157,34 +157,4 @@ class _CaptureScreenState extends State<CaptureScreen> {
       ),
     );
   }
-
-  Widget buildCaptureFrame(String imagePath, BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
-              height: double.infinity,
-              width: double.infinity,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: IconButton(
-              onPressed: () {
-                // Logic for capturing image
-              },
-              icon: Icon(Icons.camera_alt, color: Colors.blue),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
