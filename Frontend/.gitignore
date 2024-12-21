@@ -11,7 +11,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-pubspec.lock
+ios/Podfile.lock
 
 # IntelliJ related
 *.iml

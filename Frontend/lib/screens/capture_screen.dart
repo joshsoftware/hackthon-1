@@ -83,12 +83,11 @@ class _CaptureScreenState extends State<CaptureScreen> {
                       ),
                       if (uploadProgress > 0.0 && uploadProgress < 1.0)
                         Positioned.fill(
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: uploadProgress,
-                            ),
+                            child: Center(
+                          child: CircularProgressIndicator(
+                            value: uploadProgress,
                           ),
-                        ),
+                        )),
                       if (viewModel.hasImage(index))
                         Positioned(
                           top: 0,
@@ -140,13 +139,21 @@ class _CaptureScreenState extends State<CaptureScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await viewModel.uploadAllImages();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('All images uploaded successfully!'),
-                      ),
-                    );
-                    Navigator.pushNamed(context, '/resultScreen');
+                    bool success = await viewModel.uploadAllImages();
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('All images uploaded successfully!'),
+                        ),
+                      );
+                      Navigator.pushNamed(context, '/resultScreen');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Images uploading failed!'),
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
