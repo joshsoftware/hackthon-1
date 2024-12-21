@@ -31,6 +31,12 @@ class _CaptureScreenState extends State<CaptureScreen> {
           'Capture Your Photos',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.teal.shade300,
