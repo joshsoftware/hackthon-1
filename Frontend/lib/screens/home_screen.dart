@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/captureScreen');
+                Navigator.pushNamed(context, '/resultScreen');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,

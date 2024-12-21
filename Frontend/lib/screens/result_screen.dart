@@ -1,28 +1,279 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:stitch_perfect/models/measurement_model.dart';
+import 'package:stitch_perfect/viewmodels/measurement_view_model.dart';
 
-class ResultScreen extends StatefulWidget {
-  const ResultScreen({super.key});
+class MeasurementResultsPage extends StatefulWidget {
+  const MeasurementResultsPage({super.key});
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState();
+  _MeasurementResultsPageState createState() => _MeasurementResultsPageState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _MeasurementResultsPageState extends State<MeasurementResultsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch measurements once when the widget is initialized
+    final viewModel = Provider.of<MeasurementViewModel>(context, listen: false);
+    viewModel.fetchMeasurements();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<MeasurementViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text("Result"),
+        title: const Text(
+          'Your Measurements',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: "Refresh Measurements",
+            onPressed: () {
+              viewModel.fetchMeasurements();
+            },
+          ),
+        ],
       ),
-      body: Center(
-        child: Text("Result"),
-      ),
+      body: viewModel.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : viewModel.errorMessage != null
+              ? Center(
+                  child: Text(
+                    viewModel.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                )
+              : ResultScreenBody(
+                  measurements: viewModel.measurements,
+                ),
+    );
+  }
+}
+
+class ResultScreenBody extends StatelessWidget {
+  ResultScreenBody({
+    super.key,
+    required this.measurements,
+  });
+
+  final List<MeasurementModel> measurements;
+  List<MeasurementModel> topMeasurements = [];
+  List<MeasurementModel> bottomMeasurements = [];
+
+  @override
+  Widget build(BuildContext context) {
+    final double deviceHeight = MediaQuery.of(context).size.height;
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    if (measurements.length == 6) {
+      topMeasurements = measurements.take(3).toList();
+      bottomMeasurements = measurements.skip(3).toList();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        const Center(
+          child: Text(
+            'All measurements are in inches',
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Row containing the custom image on the left and the measurements
+        Expanded(
+          child: Row(
+            children: [
+              // Custom Image on the left corner without padding
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  widthFactor: 0.5, // Show only half of the image
+                  child: Container(
+                    width: deviceWidth * 0.45,
+                    height: deviceHeight * 0.6,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/images/pose_front.png'),
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                  width: 16), // Spacing between image and measurements
+              // Measurements
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Top Measurements (Above the center of the image view)
+                    Column(
+                      children: topMeasurements
+                          .map((entry) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      entry.key,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      entry.value.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                    // Bottom Measurements (Below the center of the image view)
+
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        width: double
+                            .infinity, // Makes the line take the full width
+                        height: 1, // Height of the separator line
+                        color: Colors.grey, // Grey color for the separator
+                      ),
+                    ),
+                    Column(
+                      children: bottomMeasurements
+                          .map((entry) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      entry.key,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      entry.value.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Buttons
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Add logic for "Capture Again"
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                  icon: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                  ),
+                  label: const Text('Capture Again'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Add logic for "Share"
+                    // Example measurements
+                    final measurements = {
+                      "Shoulder Width": 23.5,
+                      "Chest Circumference": 22.0,
+                      "Sleeve Length": 15.0,
+                      "Outseam Length": 30.0,
+                      "Waist Circumference": 36.0,
+                      "Hip Circumference": 38.5,
+                    };
+
+                    // Format the measurements as a string
+                    String measurementText =
+                        "Here are the body measurements:\n\n";
+                    measurements.forEach((key, value) {
+                      measurementText += "$key: $value inches\n";
+                    });
+
+                    // Share via WhatsApp (or any platform)
+                    Share.share(
+                      measurementText,
+                      subject: 'Body Measurements',
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.share,
+                    color: Colors.white,
+                  ),
+                  label: const Text('Share'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 46),
+      ],
     );
   }
 }
