@@ -1,29 +1,25 @@
 from flask import Flask, request, jsonify
 import psycopg2
-from psycopg2 import sql
 from config import Config
 import uuid
-from io import BytesIO
-from PIL import Image
 import os
+from calculate_shoulder_length import calculate_shoulder_length
+import db
+import utils
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-def get_db_connection():
-    conn = psycopg2.connect(app.config['DATABASE_URL'])
-    return conn
+UPLOAD_FOLDER = 'uploads'
 
 @app.route('/')
 def index():
-    return 'Welcome to the Flask Image Processor!'
+    return 'Welcome to StickPerfect!'
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-    print("in this")
-    print(request)
-    if 'front-hand-close' not in request.files or 'front-hand-raised' not in request.files or 'side' not in request.files or 'back' not in request.files:
-        return jsonify({"error": "All four images are required."}), 400
+    if 'front-hand-closed' not in request.files or 'front-hand-raised' not in request.files or 'side' not in request.files or 'front-hand-open' not in request.files:
+        return jsonify({"error": "All images are required."}), 400
     
     if 'height' not in request.form:
         return jsonify({"error": "Height is required."}), 400
@@ -33,60 +29,67 @@ def upload_image():
     except ValueError:
         return jsonify({"error": "Invalid height value."}), 400
 
-    front_hand_close = request.files['front-hand-close']
-    front_hand_raised = request.files['front-hand-raised']
-    side = request.files['side']
-    back = request.files['back']
-
-    image_files = [front_hand_close, front_hand_raised, side, back]
-    
     measurement_id = str(uuid.uuid4())
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    measurement_folder = os.path.join(UPLOAD_FOLDER, measurement_id)
+    
+    image_paths = {}
+    variable_to_image_map = {
+        'front-hand-close': request.files['front-hand-close'],
+        'front-hand-raised': request.files['front-hand-raised'],
+        'side': request.files['side'],
+        'back': request.files['back']
+    }
 
-    cursor.execute("""
-        INSERT INTO measurement (id, chest, waist, shoulder, armlength, height)
-        VALUES (%s, NULL, NULL, NULL, NULL, %s)
-    """, (measurement_id, height))
-    conn.commit()
+    for variable_name, image in variable_to_image_map.items():
+        filename = f"{variable_name}.jpg" 
+        file_path = os.path.join(measurement_folder, filename)
 
-    cursor.close()
-    conn.close()
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        image.save(file_path)
+        image_paths[variable_name] = file_path
 
-    process_images(image_files, measurement_id)
+        variable_to_image_map[variable_name] = file_path
+    
+    height_in_inches = utils.get_inches_from_feet(height)
+    shoulder_length = calculate_shoulder_length(variable_to_image_map['front-hand-close'], height_in_inches)
+    
+    for file_path in image_paths.values():
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
+    if os.path.exists(measurement_folder):
+        os.rmdir(measurement_folder)
+
+    data = {
+        "id": measurement_id,
+        "chest": 0,
+        "waist": 0,
+        "shoulder": shoulder_length,
+        "arm_length": 0,
+        "height": height
+    }
+    
+    db.add_measurement(data)
+    
     return jsonify({"message": "Images uploaded successfully", "id": measurement_id}), 201
 
 
-@app.route('/get_measurement/<measurement_id>', methods=['GET'])
-def get_measurement(measurement_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT chest, waist, shoulder, armlength, height
-        FROM measurement
-        WHERE id = %s
-    """, (measurement_id,))
-    
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
+@app.route('/measurement/<id>', methods=['GET'])
+def get_measurement(id):
+    result = db.get_measurement(id)
 
     if result:
         return jsonify({
-            "chest": result[0],
-            "waist": result[1],
-            "shoulder": result[2],
-            "armlength": result[3],
-            "height": result[4]
+            "chest": float(result["chest"]),
+            "waist": float(result["waist"]),
+            "shoulder": float(result["shoulder"]),
+            "armlength": float(result["arm_length"]),
+            "height": float(result["height"]) if "height" in result else None  # Handle case if height is missing
         })
     else:
         return jsonify({"error": "Measurement not found."}), 404
 
-
-def process_images(image_files, measurement_id):
-    print("in pre-process image")
 
 if __name__ == "__main__":
     app.run(debug=True)
