@@ -5,19 +5,29 @@ import 'package:stitch_perfect/utils/dialog_utils.dart';
 import 'package:stitch_perfect/viewmodels/capture_image_view_model.dart';
 
 class CaptureScreen extends StatefulWidget {
-  const CaptureScreen({super.key});
+  final String height;
+  CaptureScreen({super.key, required this.height});
 
   @override
   State<CaptureScreen> createState() => _CaptureScreenState();
 }
 
 class _CaptureScreenState extends State<CaptureScreen> {
+  late String height;
+
+  @override
+  void initState() {
+    super.initState();
+    // Store the height passed from MainScreen in the state
+    height = widget.height;
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ImageViewModel>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Capture Your Photos',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
@@ -140,7 +150,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    bool success = await viewModel.uploadAllImages();
+                    bool success = await viewModel.uploadAllImages(height);
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

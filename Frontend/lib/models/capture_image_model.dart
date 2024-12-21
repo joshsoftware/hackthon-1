@@ -9,9 +9,8 @@ class ImageModel {
       "https://probable-uniquely-scorpion.ngrok-free.app/upload"; // Replace with your server URL
 
   String responseObjId = "";
-  Future<bool> uploadAllImages(
-    List<File?> images,
-  ) async {
+
+  Future<bool> uploadAllImages(List<File?> images, String height) async {
     try {
       final uri = Uri.parse(_uploadUrl);
       final request = http.MultipartRequest("POST", uri);
@@ -19,7 +18,7 @@ class ImageModel {
         request.files.add(
             await http.MultipartFile.fromPath(getFileKey(i), images[i]!.path));
       }
-      request.fields['height'] = "5.7";
+      request.fields['height'] = height;
 
       final streamedResponse = await request.send();
       final List<int> bytes = [];
@@ -32,7 +31,7 @@ class ImageModel {
       );
 
       // Check if the upload was successful
-      if(response.statusCode == 201) {
+      if (response.statusCode == 201) {
         Map<String, dynamic> parsedResponse = json.decode(response.body);
 
         // Access specific fields

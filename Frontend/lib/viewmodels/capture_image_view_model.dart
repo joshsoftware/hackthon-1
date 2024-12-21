@@ -54,10 +54,10 @@ class ImageViewModel extends ChangeNotifier {
   }
 
   // Upload all images
-  Future<bool> uploadAllImages() async {
+  Future<bool> uploadAllImages(String height) async {
     // for (int i = 0; i < _selectedImages.length; i++) {
     //   await uploadImage(i);
     // }
-    return await _imageModel.uploadAllImages(_selectedImages);
+    return await _imageModel.uploadAllImages(_selectedImages, height);
   }
 }

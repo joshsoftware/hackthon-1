@@ -32,7 +32,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
-        '/captureScreen': (context) => CaptureScreen(),
+        '/captureScreen': (context) => CaptureScreen(
+              height: '0',
+            ),
         '/resultScreen': (context) => MeasurementResultsPage(""),
       },
       theme: ThemeData(
