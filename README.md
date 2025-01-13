@@ -1,4 +1,4 @@
-# hackthon-1
+# Stitch Perfect
 Body Measurement for Tailoring
 
 # **Body Measurement App for Tailoring**
