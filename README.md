@@ -85,7 +85,8 @@ A Flutter-based mobile app that allows users to take photos in specific poses, p
 ---
 
 ## **To-Do**
-- [ ] Add AR-based guidelines for pose correction.  
+- [ ] Add AR-based guidelines for pose correction.
+- [ ] Add more measurements eg bicep, neck measurements, etc
 - [ ] Enhance measurement accuracy with depth data from LiDAR (for supported devices).  
 - [ ] Integrate tailor APIs for seamless measurement sharing.  
 - [ ] Add multi-language support for global users.  
